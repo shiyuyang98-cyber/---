@@ -17,7 +17,8 @@ import {
   PackagePlus,
   ArrowLeft,
   Grid,
-  FileBarChart
+  FileBarChart,
+  ChevronRight
 } from 'lucide-react';
 import ScoreTable from './components/ScoreTable';
 import { TrendChart, NormalDistributionChart } from './components/Charts';
@@ -170,31 +171,33 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-slate-100 flex font-sans">
       
       {/* Mobile Sidebar Toggle */}
       <button 
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="fixed top-4 right-4 z-50 p-2 bg-white rounded-md shadow-md md:hidden"
+        className="fixed top-4 right-4 z-50 p-2 bg-white/80 backdrop-blur-md rounded-lg shadow-lg border border-slate-200 md:hidden transition-transform active:scale-95"
       >
-        {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        {isSidebarOpen ? <X className="w-6 h-6 text-slate-700" /> : <Menu className="w-6 h-6 text-slate-700" />}
       </button>
 
       {/* Sidebar */}
       <aside className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-40 w-72 bg-gradient-to-b from-slate-900 to-slate-800 text-white transform transition-transform duration-300 ease-in-out shadow-2xl
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:flex-shrink-0 flex flex-col
       `}>
-        <div className="p-6 border-b border-slate-700">
-          <div className="flex items-center gap-2 font-bold text-xl">
-            <LayoutDashboard className="w-6 h-6 text-primary" />
-            <span>数据分析平台</span>
+        <div className="p-8 border-b border-slate-700/50 bg-slate-900/50">
+          <div className="flex items-center gap-3 font-bold text-2xl tracking-tight text-white">
+            <div className="bg-indigo-500 p-2 rounded-lg shadow-lg shadow-indigo-500/30">
+              <LayoutDashboard className="w-6 h-6 text-white" />
+            </div>
+            <span>数据罗盘</span>
           </div>
-          <p className="text-xs text-slate-400 mt-2">智能分数预测系统</p>
+          <p className="text-xs text-slate-400 mt-3 font-medium tracking-wide opacity-70">智能质量指标预测系统</p>
         </div>
         
         {/* Navigation */}
-        <nav className="p-4 space-y-2 flex-1 overflow-y-auto">
+        <nav className="p-4 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar">
           {/* Summary View Link */}
           <button
             onClick={() => {
@@ -202,17 +205,18 @@ function App() {
               setActiveIndicatorId(null);
               setIsSidebarOpen(false);
             }}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-sm font-medium mb-4
+            className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 text-sm font-semibold mb-6 group relative overflow-hidden
               ${viewMode === 'summary'
-                ? 'bg-emerald-600 text-white shadow-md' 
-                : 'text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/50'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg shadow-emerald-500/20' 
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
           >
-            <FileBarChart className="w-5 h-5" />
+            <div className={`absolute inset-0 bg-white/10 opacity-0 transition-opacity ${viewMode === 'summary' ? 'opacity-0' : 'group-hover:opacity-100'}`}></div>
+            <FileBarChart className={`w-5 h-5 ${viewMode === 'summary' ? 'text-white' : 'text-emerald-400'}`} />
             全平台汇总报表
           </button>
 
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-4 px-2">各平台入口</div>
+          <div className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3 mt-6 px-4">平台入口</div>
           {PLATFORMS.map((platform) => {
             const Icon = platform.icon;
             const isActive = viewMode === 'platform' && currentPlatformId === platform.id;
@@ -222,50 +226,68 @@ function App() {
                 onClick={() => {
                   setCurrentPlatformId(platform.id);
                   setViewMode('platform');
-                  setActiveIndicatorId(null); // Go back to list when changing platform
+                  setActiveIndicatorId(null);
                   setIsSidebarOpen(false);
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-sm font-medium
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium relative group
                   ${isActive
-                    ? 'bg-primary text-white shadow-md' 
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/20' 
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
                   }`}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-indigo-200' : 'text-slate-500 group-hover:text-indigo-400'}`} />
                 {platform.name}
+                {isActive && <ChevronRight className="w-4 h-4 absolute right-3 text-indigo-300 opacity-70" />}
               </button>
             );
           })}
         </nav>
+        
+        {/* User / Footer */}
+        <div className="p-4 bg-slate-900/80 border-t border-slate-700/50">
+          <div className="flex items-center gap-3">
+             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-xs font-bold shadow-lg">AI</div>
+             <div className="flex-1">
+               <p className="text-sm font-semibold text-slate-200">Admin User</p>
+               <p className="text-xs text-slate-500">在线</p>
+             </div>
+          </div>
+        </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 min-w-0 overflow-auto flex flex-col h-screen">
+      <main className="flex-1 min-w-0 overflow-auto flex flex-col h-screen bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
         <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
           
           {/* Render based on View Mode */}
           {viewMode === 'summary' ? (
-            <GlobalSummary platforms={PLATFORMS} dataMap={dataMap} />
+            <div className="animate-slide-up">
+               <GlobalSummary platforms={PLATFORMS} dataMap={dataMap} />
+            </div>
           ) : (
             <>
               {/* Header Area */}
-              <header className="mb-6">
+              <header className="mb-8 animate-fade-in">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
+                    <h1 className="text-4xl font-extrabold text-slate-900 flex items-center gap-3 tracking-tight">
                       {currentPlatform.name} 
-                      <span className="text-slate-400 font-normal text-lg hidden sm:inline">| 质量指标管理</span>
+                      <span className="text-slate-300 font-light text-2xl hidden sm:inline">|</span>
+                      <span className="text-slate-500 font-medium text-lg hidden sm:inline">质量指标管理</span>
                     </h1>
                     
                     {/* Breadcrumbs */}
-                    <div className="flex items-center gap-2 text-sm text-slate-500 mt-2">
-                       <span className="cursor-pointer hover:text-primary" onClick={() => setActiveIndicatorId(null)}>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 mt-2 font-medium">
+                       <span 
+                         className="cursor-pointer hover:text-indigo-600 transition-colors bg-white px-2 py-0.5 rounded shadow-sm border border-slate-200" 
+                         onClick={() => setActiveIndicatorId(null)}
+                       >
                          {currentPlatform.name}
                        </span>
                        {activeIndicator && (
                          <>
-                           <span>/</span>
-                           <span className="font-semibold text-slate-700">{activeIndicator.name}</span>
+                           <ChevronRight className="w-3 h-3 text-slate-400" />
+                           <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">{activeIndicator.name}</span>
                          </>
                        )}
                     </div>
@@ -276,19 +298,21 @@ function App() {
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setActiveIndicatorId(null)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-colors text-sm font-medium"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:shadow-md transition-all text-sm font-semibold group"
                       >
-                        <ArrowLeft className="w-4 h-4" />
+                        <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
                         返回列表
                       </button>
                       <button
                         onClick={runAnalysis}
                         disabled={isLoading}
-                        className={`flex items-center gap-2 px-6 py-2 rounded-lg font-semibold text-white shadow-md transition-all
-                          ${isLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-primary hover:bg-indigo-700'}`}
+                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-white shadow-lg shadow-indigo-500/30 transition-all hover:scale-105 active:scale-95
+                          ${isLoading 
+                            ? 'bg-slate-400 cursor-not-allowed' 
+                            : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500'}`}
                       >
                         {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                        {isLoading ? '分析中...' : '生成 AI 预测'}
+                        {isLoading ? 'AI 正在思考...' : '生成 AI 预测'}
                       </button>
                     </div>
                   )}
@@ -298,12 +322,14 @@ function App() {
               {/* View Switcher */}
               {!activeIndicator ? (
                 /* --- Grid View (Indicators) --- */
-                <div className="animate-fade-in">
-                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6 flex items-start gap-3">
-                     <Grid className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                <div className="animate-slide-up">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100/50 rounded-2xl p-5 mb-8 flex items-start gap-4 shadow-sm">
+                     <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
+                        <Grid className="w-6 h-6" />
+                     </div>
                      <div>
-                       <h3 className="font-semibold text-blue-900 text-sm">操作指南</h3>
-                       <p className="text-blue-700 text-sm mt-1">
+                       <h3 className="font-bold text-blue-900 text-base">操作指南</h3>
+                       <p className="text-blue-700/80 text-sm mt-1 leading-relaxed">
                          当前平台包含 23 个关键指标。您可以直接点击指标名称进行修改。点击“分析”按钮进入详情页录入分数并获取智能建议。
                        </p>
                      </div>
@@ -316,10 +342,10 @@ function App() {
                 </div>
               ) : (
                 /* --- Detail View (Single Indicator) --- */
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-slide-up pb-10">
                   
                   {/* Left Column: Data Input */}
-                  <div className="lg:col-span-3 h-[500px] lg:h-auto">
+                  <div className="lg:col-span-3 h-[600px] lg:h-auto">
                      <ScoreTable data={activeIndicator.scores} onUpdate={handleUpdateScore} onReset={handleResetScores} />
                   </div>
 
@@ -328,39 +354,46 @@ function App() {
                     
                     {/* Stats Row */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                        <p className="text-xs text-slate-500 uppercase font-semibold">平均分 (Mean)</p>
-                        <p className="text-2xl font-bold text-slate-800">{stats.mean.toFixed(1)}</p>
+                      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                        <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">平均分 (Mean)</p>
+                        <p className="text-3xl font-black text-slate-800 mt-1">{stats.mean.toFixed(1)}</p>
                       </div>
-                      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                        <p className="text-xs text-slate-500 uppercase font-semibold">标准差 (Std Dev)</p>
-                        <p className="text-2xl font-bold text-slate-800">{stats.stdDev.toFixed(1)}</p>
+                      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                        <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">标准差 (Std Dev)</p>
+                        <p className="text-3xl font-black text-slate-800 mt-1">{stats.stdDev.toFixed(1)}</p>
                       </div>
-                      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                        <p className="text-xs text-slate-500 uppercase font-semibold">最高分 (Max)</p>
-                        <p className="text-2xl font-bold text-emerald-600">{stats.max}</p>
+                      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                        <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">最高分 (Max)</p>
+                        <p className="text-3xl font-black text-emerald-500 mt-1">{stats.max}</p>
                       </div>
-                      <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                         <p className="text-xs text-slate-500 uppercase font-semibold">稳定性</p>
-                         <p className="text-lg font-bold text-slate-800">
-                           {stats.stdDev === 0 ? '-' : stats.stdDev < 2 ? '非常稳定' : stats.stdDev < 8 ? '正常' : '波动'}
-                         </p>
+                      <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                         <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">稳定性</p>
+                         <div className="flex items-center gap-2 mt-1">
+                           <span className={`w-3 h-3 rounded-full ${stats.stdDev < 2 ? 'bg-emerald-500 animate-pulse' : stats.stdDev < 8 ? 'bg-amber-500' : 'bg-red-500'}`}></span>
+                           <p className="text-xl font-bold text-slate-800">
+                             {stats.stdDev === 0 ? '-' : stats.stdDev < 2 ? '非常稳定' : stats.stdDev < 8 ? '正常' : '波动'}
+                           </p>
+                         </div>
                       </div>
                     </div>
 
                     {/* Charts Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                          <TrendingUp className="w-4 h-4 text-slate-500" />
+                      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition-all duration-300">
+                        <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                          <div className="p-1.5 bg-indigo-100 rounded text-indigo-600">
+                            <TrendingUp className="w-4 h-4" />
+                          </div>
                           12个月趋势
                         </h3>
                         <TrendChart data={activeIndicator.scores} />
                       </div>
 
-                      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                          <span className="w-4 h-4 rounded-full bg-emerald-100 border border-emerald-500 flex items-center justify-center text-[10px] font-bold text-emerald-700">Ω</span>
+                      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg transition-all duration-300">
+                        <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                          <div className="p-1.5 bg-emerald-100 rounded text-emerald-600 font-serif font-bold text-xs w-7 h-7 flex items-center justify-center">
+                            Ω
+                          </div>
                           概率分布
                         </h3>
                         <NormalDistributionChart 
@@ -373,75 +406,85 @@ function App() {
                     </div>
 
                     {/* AI Analysis Row */}
-                    <div className="bg-white rounded-xl shadow-md border border-indigo-100 overflow-hidden">
-                       <div className="bg-indigo-50/50 p-4 border-b border-indigo-100 flex items-center justify-between">
-                         <h2 className="font-semibold text-indigo-900 flex items-center gap-2">
-                           <Sparkles className="w-5 h-5 text-indigo-500" />
-                           下个月目标建议 (AI)
-                         </h2>
-                         {activeIndicator.analysis && (
-                           <span className="px-3 py-1 bg-white rounded-full text-xs font-bold text-indigo-600 shadow-sm border border-indigo-100">
-                             难度: {activeIndicator.analysis.difficulty}
-                           </span>
-                         )}
+                    <div className="bg-white rounded-2xl shadow-xl shadow-indigo-100/50 border border-white overflow-hidden transform transition-all hover:scale-[1.01]">
+                       <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-1">
+                          <div className="bg-white/95 backdrop-blur-xl p-4 flex items-center justify-between">
+                             <h2 className="font-bold text-indigo-900 flex items-center gap-2 text-lg">
+                               <Sparkles className="w-5 h-5 text-purple-500 fill-purple-100" />
+                               AI 智能分析报告
+                             </h2>
+                             {activeIndicator.analysis && (
+                               <span className="px-3 py-1 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-full text-xs font-bold text-indigo-600 border border-indigo-100">
+                                 难度指数: {activeIndicator.analysis.difficulty}
+                               </span>
+                             )}
+                          </div>
                        </div>
                        
-                       <div className="p-6">
+                       <div className="p-8">
                          {activeIndicator.analysis ? (
-                           <div className="flex flex-col md:flex-row gap-8">
-                             <div className="flex-shrink-0 text-center md:text-left space-y-4">
+                           <div className="flex flex-col md:flex-row gap-10">
+                             <div className="flex-shrink-0 text-center md:text-left space-y-6 md:w-1/3 border-b md:border-b-0 md:border-r border-slate-100 pb-6 md:pb-0 md:pr-6">
                                <div>
-                                  <p className="text-sm text-slate-500 mb-1">建议目标分</p>
-                                  <p className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-                                    {activeIndicator.analysis.recommendedScore}
-                                  </p>
-                                  <p className="text-xs text-slate-400 mt-1">
-                                    (比平均值高 {getSigma()}σ)
+                                  <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">建议目标值</p>
+                                  <div className="relative inline-block">
+                                     <p className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-600 to-purple-600 drop-shadow-sm">
+                                       {activeIndicator.analysis.recommendedScore}
+                                     </p>
+                                  </div>
+                                  <p className="text-xs font-medium text-slate-400 mt-2 bg-slate-50 inline-block px-2 py-1 rounded">
+                                    较平均值 +{getSigma()}σ
                                   </p>
                                </div>
                                
-                               <div className="pt-2 border-t border-slate-100">
-                                  <p className="text-sm text-red-500 font-semibold mb-1 flex items-center justify-center md:justify-start gap-1">
+                               <div className="pt-4">
+                                  <p className="text-xs font-bold text-red-400 uppercase tracking-wider mb-1 flex items-center justify-center md:justify-start gap-1">
                                     <AlertCircle className="w-3 h-3" />
-                                    警戒值
+                                    警戒阈值
                                   </p>
-                                  <p className="text-2xl font-bold text-red-600">
+                                  <p className="text-3xl font-bold text-slate-700">
                                     {activeIndicator.analysis.warningScore}
                                   </p>
                                </div>
                              </div>
                              
-                             <div className="flex-1 space-y-4">
-                               <div>
-                                 <h4 className="font-bold text-slate-800 mb-1">分析摘要</h4>
-                                 <p className="text-slate-600 text-sm leading-relaxed">{activeIndicator.analysis.reasoning}</p>
+                             <div className="flex-1 space-y-6">
+                               <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+                                 <h4 className="font-bold text-indigo-900 mb-2 text-sm">分析摘要</h4>
+                                 <p className="text-indigo-800/80 text-sm leading-relaxed">{activeIndicator.analysis.reasoning}</p>
                                </div>
                                <div>
-                                 <h4 className="font-bold text-slate-800 mb-2">关键行动建议</h4>
-                                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                 <h4 className="font-bold text-slate-800 mb-3 text-sm flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    关键行动建议
+                                 </h4>
+                                 <div className="grid grid-cols-1 gap-3">
                                    {activeIndicator.analysis.advice.map((tip, idx) => (
-                                     <li key={idx} className="flex items-start gap-2 text-sm text-slate-600">
-                                       <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
-                                       {tip}
-                                     </li>
+                                     <div key={idx} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-100 transition-all">
+                                       <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                                         {idx + 1}
+                                       </div>
+                                       <p className="text-sm text-slate-600 mt-0.5 font-medium">{tip}</p>
+                                     </div>
                                    ))}
-                                 </ul>
+                                 </div>
                                </div>
                              </div>
                            </div>
                          ) : (
-                           <div className="text-center py-10">
-                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-3">
-                               <BarChart3 className="w-6 h-6 text-slate-400" />
+                           <div className="text-center py-16 flex flex-col items-center justify-center opacity-60">
+                             <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                               <BarChart3 className="w-8 h-8 text-slate-400" />
                              </div>
-                             <p className="text-slate-500">
-                               请录入该指标的历史数据，并点击右上角的<br/> "生成 AI 预测" 获取分析结果。
+                             <h3 className="text-lg font-bold text-slate-700">等待分析</h3>
+                             <p className="text-slate-500 mt-2 max-w-sm">
+                               请录入历史数据，点击上方 <span className="text-indigo-600 font-bold">"生成 AI 预测"</span> 按钮启动智能分析引擎。
                              </p>
                            </div>
                          )}
                          {error && (
-                           <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-lg flex items-center gap-2 text-sm">
-                             <AlertCircle className="w-4 h-4" />
+                           <div className="mt-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl flex items-center gap-3 text-sm shadow-sm">
+                             <AlertCircle className="w-5 h-5 flex-shrink-0" />
                              {error}
                            </div>
                          )}
