@@ -1,0 +1,5 @@
+{
+  "name": "ScoreTrend AI",
+  "description": "A smart score analysis tool that visualizes 12-month trends and uses Normal Distribution + AI to recommend future targets.",
+  "requestFramePermissions": []
+}
